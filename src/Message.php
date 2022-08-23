@@ -1,5 +1,5 @@
 <?php
-namespace shulyak\sendgrid;
+namespace perfectpanel\sendgrid;
 
 use Yii;
 use yii\base\InvalidConfigException;

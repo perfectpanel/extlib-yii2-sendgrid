@@ -1,5 +1,5 @@
 <?php
-namespace shulyak\sendgrid;
+namespace perfectpanel\sendgrid;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -13,7 +13,7 @@ class Mailer extends BaseMailer
     /**
      * @var string the default class name of the new message instances created by [[createMessage()]]
      */
-    public $messageClass = 'shulyak\sendgrid\Message';
+    public $messageClass = 'perfectpanel\sendgrid\Message';
 
     /**
      * @var string the directory where the email messages are saved when [[useFileTransport]] is true.

@@ -10,13 +10,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist shulyak/yii2-sendgrid
+php composer.phar require --prefer-dist perfectpanel/yii2-sendgrid
 ```
 
 or add
 
 ```json
-"shulyak/yii2-sendgrid": "~1.0"
+"perfectpanel/yii2-sendgrid": "~1.0"
 ```
 
 to the require section of your application's `composer.json` file.
