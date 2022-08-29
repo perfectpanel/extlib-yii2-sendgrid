@@ -16,7 +16,7 @@ php composer.phar require --prefer-dist perfectpanel/yii2-sendgrid
 or add
 
 ```json
-"perfectpanel/yii2-sendgrid": "~1.0"
+"perfectpanel/yii2-sendgrid": "1.0"
 ```
 
 to the require section of your application's `composer.json` file.
