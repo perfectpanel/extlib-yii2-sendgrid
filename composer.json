@@ -12,8 +12,8 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2": "~2.0.11",
-        "sendgrid/sendgrid": "~5.4"
+        "yiisoft/yii2": ">=2.0.11",
+        "sendgrid/sendgrid": ">=5.4"
     },
     "autoload": {
         "psr-4": {
