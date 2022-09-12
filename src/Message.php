@@ -1,6 +1,19 @@
 <?php
 namespace perfectpanel\sendgrid;
 
+use SendGrid\Mail\Attachment;
+use SendGrid\Mail\Bcc;
+use SendGrid\Mail\Cc;
+use SendGrid\Mail\Content;
+use SendGrid\Mail\CustomArg;
+use SendGrid\Mail\From;
+use SendGrid\Mail\Header;
+use SendGrid\Mail\Mail;
+use SendGrid\Mail\Personalization;
+use SendGrid\Mail\ReplyTo;
+use SendGrid\Mail\SendAt;
+use SendGrid\Mail\Subject;
+use SendGrid\Mail\To;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
@@ -173,7 +186,7 @@ class Message extends BaseMessage
     public $charset;
 
     /**
-     * @return \SendGrid\Mail Object
+     * @return Mail Object
      */
     public function getSendGridMail()
     {
@@ -187,12 +200,12 @@ class Message extends BaseMessage
     /**
      * Create SendGrid Mail object
      *
-     * @return \SendGrid\Mail
+     * @return Mail
      * @throws \yii\base\InvalidConfigException
      */
     public function createSendGridMail()
     {
-        return new \SendGrid\Mail();
+        return new Mail();
     }
 
     public function addPersonalization($personalization)
@@ -451,7 +464,7 @@ class Message extends BaseMessage
     /**
      * Builds the SendGrid message payload.
      *
-     * @return \SendGrid\Mail instance or false on error
+     * @return Mail instance or false on error
      */
     public function buildMessage()
     {
@@ -481,20 +494,20 @@ class Message extends BaseMessage
 
                     } else {
 
-                        $personalization = new \SendGrid\Personalization();
+                        $personalization = new Personalization();
 
                         if ( is_array($envelope['to']) ) {
                             foreach ($envelope['to'] as $key => $val) {
                                 if ( is_int($key) ) {
                                     // `[0 => email]`
-                                    $personalization->addTo( new \SendGrid\Email(null, $val) );
+                                    $personalization->addTo( new To($val) );
                                 } else {
                                     // `[email => name]`
-                                    $personalization->addTo( new \SendGrid\Email($val, $key) );
+                                    $personalization->addTo( new To($key, $val) );
                                 }
                             }
                         } else {
-                            $personalization->addTo( new \SendGrid\Email(null, $envelope['to']) );
+                            $personalization->addTo( new To($envelope['to']) );
                         }
 
                         if ( isset($envelope['bcc']) ) {
@@ -502,14 +515,14 @@ class Message extends BaseMessage
                                 foreach ($envelope['bcc'] as $key => $val) {
                                     if ( is_int($key) ) {
                                         // `[0 => email]`
-                                        $personalization->addBcc( new \SendGrid\Email(null, $val) );
+                                        $personalization->addBcc( new Bcc($val) );
                                     } else {
                                         // `[email => name]`
-                                        $personalization->addBcc( new \SendGrid\Email($val, $key) );
+                                        $personalization->addBcc( new Bcc($key, $val) );
                                     }
                                 }
                             } else {
-                                $personalization->addBcc( new \SendGrid\Email(null, $envelope['bcc']) );
+                                $personalization->addBcc( new Bcc($envelope['bcc']) );
                             }
                         }
 
@@ -518,24 +531,24 @@ class Message extends BaseMessage
                                 foreach ($envelope['cc'] as $key => $val) {
                                     if ( is_int($key) ) {
                                         // `[0 => email]`
-                                        $personalization->addCc( new \SendGrid\Email(null, $val) );
+                                        $personalization->addCc( new Cc($val) );
                                     } else {
                                         // `[email => name]`
-                                        $personalization->addCc( new \SendGrid\Email($val, $key) );
+                                        $personalization->addCc( new Cc($key, $val) );
                                     }
                                 }
                             } else {
-                                $personalization->addCc( new \SendGrid\Email(null, $envelope['cc']) );
+                                $personalization->addCc( new Cc($envelope['cc']) );
                             }
                         }
 
                         if ( isset($envelope['subject']) ) {
-                            $personalization->setSubject( (string) $envelope['subject'] );
+                            $personalization->setSubject( new Subject($envelope['subject']) );
                         }
 
                         if ( isset($envelope['headers']) && is_array($envelope['headers']) ) {
                             foreach ( $envelope['headers'] as $key => $val ) {
-                                $personalization->addHeader((string) $key, (string) $val);
+                                $personalization->addHeader( new Header($key, $val));
                             }
                         }
 
@@ -547,12 +560,12 @@ class Message extends BaseMessage
 
                         if ( isset($envelope['custom_args']) && is_array($envelope['custom_args']) ) {
                             foreach ($envelope['custom_args'] as $key => $val) {
-                                $personalization->addCustomArg((string) $key, (string) $val);
+                                $personalization->addCustomArg( new CustomArg($key, $val));
                             }
                         }
 
                         if ( isset($envelope['send_at']) && is_int($envelope['send_at']) ) {
-                            $personalization->setSendAt($envelope['send_at']);
+                            $personalization->setSendAt( new SendAt($envelope['send_at']));
                         }
 
                         $this->getSendGridMail()->addPersonalization($personalization);
@@ -564,20 +577,20 @@ class Message extends BaseMessage
             } else {
 
                 // Single Send Mode
-                $personalization = new \SendGrid\Personalization();
+                $personalization = new Personalization();
 
                 if ( is_array($this->to) ) {
                     foreach ($this->to as $key => $val) {
                         if ( is_int($key) ) {
                             // `[0 => email]`
-                            $personalization->addTo( new \SendGrid\Email(null, $val) );
+                            $personalization->addTo( new To($val) );
                         } else {
                             // `[email => name]`
-                            $personalization->addTo( new \SendGrid\Email($val, $key) );
+                            $personalization->addTo( new To($key, $val) );
                         }
                     }
                 } else {
-                    $personalization->addTo( new \SendGrid\Email(null, $this->to) );
+                    $personalization->addTo( new To($this->to) );
                 }
 
                 if ( isset($this->bcc) ) {
@@ -585,14 +598,14 @@ class Message extends BaseMessage
                         foreach ($this->bcc as $key => $val) {
                             if ( is_int($key) ) {
                                 // `[0 => email]`
-                                $personalization->addBcc( new \SendGrid\Email(null, $val) );
+                                $personalization->addBcc( new Bcc($val) );
                             } else {
                                 // `[email => name]`
-                                $personalization->addBcc( new \SendGrid\Email($val, $key) );
+                                $personalization->addBcc( new Bcc($key, $val) );
                             }
                         }
                     } else {
-                        $personalization->addBcc( new \SendGrid\Email(null, $this->bcc) );
+                        $personalization->addBcc( new Bcc($this->bcc) );
                     }
                 }
 
@@ -601,14 +614,14 @@ class Message extends BaseMessage
                         foreach ($this->cc as $key => $val) {
                             if ( is_int($key) ) {
                                 // `[0 => email]`
-                                $personalization->addCc( new \SendGrid\Email(null, $val) );
+                                $personalization->addCc( new Cc($val) );
                             } else {
                                 // `[email => name]`
-                                $personalization->addCc( new \SendGrid\Email($val, $key) );
+                                $personalization->addCc( new Cc($key, $val) );
                             }
                         }
                     } else {
-                        $personalization->addCc( new \SendGrid\Email(null, $this->cc) );
+                        $personalization->addCc( new Cc($this->cc) );
                     }
                 }
 
@@ -624,13 +637,13 @@ class Message extends BaseMessage
 
             if ( is_array($this->from) ) {
                 if ( is_numeric(key($this->from)) ) {
-                    $this->getSendGridMail()->setFrom( new \SendGrid\Email(null, $this->from[0]) );
+                    $this->getSendGridMail()->setFrom( new From($this->from[0]) );
                 } else {
                     reset($this->from);     // reset pointer to beginning. Necessary when using current() and key()
-                    $this->getSendGridMail()->setFrom( new \SendGrid\Email(current($this->from), key($this->from)) );
+                    $this->getSendGridMail()->setFrom( new From(key($this->from), current($this->from)) );
                 }
             } else {
-                $this->getSendGridMail()->setFrom( new \SendGrid\Email(null, $this->from) );
+                $this->getSendGridMail()->setFrom( new From($this->from) );
             }
 
             // SendGrid-PHP library only supports string email
@@ -639,7 +652,7 @@ class Message extends BaseMessage
             // @TODO Was this fixed in newer versions?
             if ( isset($this->replyTo) ) {
                 if ( is_string($this->replyTo) ) {
-                    $this->getSendGridMail()->setReplyTo( new \SendGrid\ReplyTo($this->replyTo) );
+                    $this->getSendGridMail()->setReplyTo( new ReplyTo($this->replyTo) );
                 } else {
                     Yii::warning('ReplyTo must be a string and was ignored!');
                 }
@@ -649,20 +662,20 @@ class Message extends BaseMessage
 
             if ( isset($this->textBody) && !empty($this->textBody) )
             {
-                $content = new \SendGrid\Content('text/plain', $this->textBody);
+                $content = new Content('text/plain', $this->textBody);
                 $this->getSendGridMail()->addContent($content);
             } else {
                 // According to RFC 1341, section 7.2, plain text content needs to come
                 // before any HTML content. Since Yii first adds HTML content in some
                 // circumstances, SendGrid refuses to send the message. We therefore
                 // always prepend plain text content to the message.
-                $content = new \SendGrid\Content('text/plain', ' ');
+                $content = new Content('text/plain', ' ');
                 $this->getSendGridMail()->addContent($content);
             }
 
             if ( isset($this->htmlBody) && !empty($this->htmlBody) )
             {
-                $content = new \SendGrid\Content('text/html', $this->htmlBody);
+                $content = new Content('text/html', $this->htmlBody);
                 $this->getSendGridMail()->addContent($content);
             }
 
@@ -673,7 +686,7 @@ class Message extends BaseMessage
                     {
                         $content = base64_encode(file_get_contents($file));
 
-                        $sgAttachment = new \SendGrid\Attachment();
+                        $sgAttachment = new Attachment();
                         $sgAttachment->setContent($content);
 
                         if ( isset($attachment['options']) && is_array($attachment['options']) && !empty($attachment['options']) )
